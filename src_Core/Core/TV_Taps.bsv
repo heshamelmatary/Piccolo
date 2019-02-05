@@ -33,7 +33,7 @@ import GetPut_Aux  :: *;
 import ISA_Decls  :: *;
 import TV_Info    :: *;
 
-import AXI4_Types   :: *;
+import AXI4   :: *;
 import Fabric_Defs  :: *;
 
 // ================================================================

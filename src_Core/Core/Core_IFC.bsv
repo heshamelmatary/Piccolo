@@ -18,7 +18,7 @@ import ClientServer  :: *;
 // Project imports
 
 // Main fabric
-import AXI4_Types   :: *;
+import AXI4   :: *;
 import Fabric_Defs  :: *;
 
 `ifdef INCLUDE_TANDEM_VERIF
@@ -41,13 +41,16 @@ interface Core_IFC;
    interface Server #(Bit #(0), Bit #(0))  cpu_reset_server;
 
    // CPU IMem to Fabric master interface
-   interface AXI4_Master_IFC #(Wd_Id, Wd_Addr, Wd_Data, Wd_User) cpu_imem_master;
+   interface AXI4_Master_Synth #(Wd_Id, Wd_Addr, Wd_Data,
+                                 Wd_User, Wd_User, Wd_User, Wd_User, Wd_User) cpu_imem_master;
 
    // CPU DMem to Fabric master interface
-   interface AXI4_Master_IFC #(Wd_Id, Wd_Addr, Wd_Data, Wd_User) cpu_dmem_master;
+   interface AXI4_Master_Synth #(Wd_Id, Wd_Addr, Wd_Data,
+                                 Wd_User, Wd_User, Wd_User, Wd_User, Wd_User) cpu_dmem_master;
 
    // CPU Back-door slave interface from fabric
-   interface AXI4_Slave_IFC #(Wd_Id, Wd_Addr, Wd_Data, Wd_User) cpu_slave;
+   interface AXI4_Slave_Synth #(Wd_Id, Wd_Addr, Wd_Data, Wd_User,
+                                Wd_User, Wd_User, Wd_User, Wd_User) cpu_slave;
 
    // External interrupts
    (* always_ready, always_enabled *)

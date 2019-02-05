@@ -23,7 +23,7 @@ import Cur_Cycle  :: *;
 // Project imports
 
 import Semi_FIFOF :: *;
-import AXI4_Types :: *;
+import AXI4 :: *;
 
 // ================================================================
 // The interface for the fabric module

@@ -25,7 +25,7 @@ import GetPut_Aux :: *;
 // Project imports
 
 // Main fabric
-import AXI4_Types  :: *;
+import AXI4  :: *;
 
 `ifdef INCLUDE_GDB_CONTROL
 import Debug_Module     :: *;

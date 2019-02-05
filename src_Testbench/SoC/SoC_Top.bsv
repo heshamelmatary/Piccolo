@@ -28,12 +28,10 @@ import Memory        :: *;
 import Cur_Cycle   :: *;
 import GetPut_Aux  :: *;
 
+import AXI4 :: *;
+
 // ================================================================
 // Project imports
-
-// Main fabric
-import AXI4_Types  :: *;
-import AXI4_Fabric :: *;
 
 import Fabric_Defs :: *;
 import SoC_Map     :: *;

@@ -40,7 +40,7 @@ import GetPut_Aux :: *;
 import ISA_Decls    :: *;
 import Near_Mem_IFC :: *;
 import MMU_Cache    :: *;
-import AXI4_Types   :: *;
+import AXI4   :: *;
 import Near_Mem_IO  :: *;
 import Fabric_Defs  :: *;
 
@@ -270,7 +270,7 @@ module mkNear_Mem (Near_Mem_IFC);
    // Back-door slave interface from fabric into Near_Mem
    // There is no back-door into the caches.
 
-   interface near_mem_slave = dummy_AXI4_Slave_ifc;
+   interface near_mem_slave = culDeSac;
 endmodule
 
 // ================================================================

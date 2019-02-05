@@ -37,7 +37,7 @@ import EdgeFIFOFs :: *;
 // Project imports
 
 import AXI4_Lite_Types         :: *;
-import AXI4_Types              :: *;
+import AXI4              :: *;
 
 // ================================================================
 // Compute the encoding of AWSIZE/ARSIZE

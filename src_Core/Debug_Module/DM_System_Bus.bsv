@@ -22,7 +22,7 @@ import Semi_FIFOF :: *;
 import ISA_Decls :: *;
 import DM_Common :: *;
 
-import AXI4_Types  :: *;
+import AXI4  :: *;
 import Fabric_Defs :: *;
 
 // ================================================================

@@ -38,7 +38,7 @@ import Cur_Cycle :: *;
 
 import ISA_Decls       :: *;
 
-import AXI4_Types  :: *;
+import AXI4  :: *;
 import Fabric_Defs :: *;
 
 // ================================================================
@@ -54,7 +54,8 @@ interface Near_Mem_IFC;
    interface IMem_IFC  imem;
 
    // Fabric side
-   interface AXI4_Master_IFC #(Wd_Id, Wd_Addr, Wd_Data, Wd_User) imem_master;
+   interface AXI4_Master_Synth #(Wd_Id, Wd_Addr, Wd_Data,
+                                 Wd_User, Wd_User, Wd_User, Wd_User, Wd_User) imem_master;
 
    // ----------------
    // DMem
@@ -63,7 +64,8 @@ interface Near_Mem_IFC;
    interface DMem_IFC  dmem;
 
    // Fabric side
-   interface AXI4_Master_IFC #(Wd_Id, Wd_Addr, Wd_Data, Wd_User) dmem_master;
+   interface AXI4_Master_Synth #(Wd_Id, Wd_Addr, Wd_Data,
+                                 Wd_User, Wd_User, Wd_User, Wd_User, Wd_User) dmem_master;
 
    // ----------------
    // Fences
@@ -87,7 +89,8 @@ interface Near_Mem_IFC;
 
    // ----------------
    // Back-door slave interface from fabric into Near_Mem
-   interface AXI4_Slave_IFC #(Wd_Id, Wd_Addr, Wd_Data, Wd_User) near_mem_slave;
+   interface AXI4_Slave_Synth #(Wd_Id, Wd_Addr, Wd_Data,
+                                Wd_User, Wd_User, Wd_User, Wd_User, Wd_User) near_mem_slave;
 endinterface
    
 // ================================================================
