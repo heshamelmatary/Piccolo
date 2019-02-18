@@ -21,6 +21,7 @@ import GetPut        :: *;
 import ClientServer  :: *;
 import Connectable   :: *;
 import Memory        :: *;
+import Vector        :: *;
 
 // ----------------
 // BSV additional libs
@@ -29,6 +30,7 @@ import Cur_Cycle   :: *;
 import GetPut_Aux  :: *;
 
 import AXI4 :: *;
+import Routable :: *;
 
 // ================================================================
 // Project imports
@@ -111,9 +113,6 @@ module mkSoC_Top (SoC_Top_IFC);
    // CPU + Debug module
    Core_IFC  core <- mkCore;
 
-   // SoC Fabric
-   Fabric_AXI4_IFC  fabric <- mkFabric_AXI4;
-
    // SoC Boot ROM
    Boot_ROM_IFC  boot_rom <- mkBoot_ROM;
 
@@ -132,51 +131,64 @@ module mkSoC_Top (SoC_Top_IFC);
    // SoC fabric master connections
    // Note: see 'SoC_Map' for 'master_num' definitions
 
+   Vector#(Num_Masters, AXI4_Master_Synth #(Wd_Id, Wd_Addr, Wd_Data, Wd_User, Wd_User, Wd_User, Wd_User, Wd_User)) master_vector = newVector;
+
    // CPU IMem master to fabric
-   mkConnection (core.cpu_imem_master,  fabric.v_from_masters [imem_master_num]);
+   master_vector[imem_master_num] = core.cpu_imem_master;
 
    // CPU DMem master to fabric
-   mkConnection (core.cpu_dmem_master,  fabric.v_from_masters [dmem_master_num]);
+   master_vector[dmem_master_num] = core.cpu_dmem_master;
 
 `ifdef INCLUDE_GDB_CONTROL
    // Debug Module system buf interface (mem interface) to fabric
-   mkConnection (core.dm_master,  fabric.v_from_masters [debug_module_master_num]);
+   master_vector[debug_module_master_num] = core.dm_master;
 `else
-   AXI4_Master_IFC #(Wd_Id, Wd_Addr, Wd_Data, Wd_User) dummy_dm_master = dummy_AXI4_Master_ifc;
-   mkConnection (dummy_dm_master,  fabric.v_from_masters [debug_module_master_num]);
+   master_vector[debug_module_master_num] = culDeSac;
 `endif
 
 `ifdef INCLUDE_ACCEL0
    // accel_aes0 to fabric
-   mkConnection (accel_aes0.master,  fabric.v_from_masters [accel0_master_num]);
+   master_vector[accel0_master_num] = accel_aes0.master;
 `endif
 
    // ----------------
    // SoC fabric slave connections
    // Note: see 'SoC_Map' for 'slave_num' definitions
 
+   Vector#(Num_Slaves, AXI4_Slave_Synth #(Wd_Id, Wd_Addr, Wd_Data, Wd_User, Wd_User, Wd_User, Wd_User, Wd_User)) slave_vector = newVector;
+   Vector#(Num_Slaves, Range#(Wd_Addr))                             route_vector = newVector;
+
    // Fabric to Boot ROM
-   mkConnection (fabric.v_to_slaves [boot_rom_slave_num], boot_rom.slave);
+   slave_vector[boot_rom_slave_num] = boot_rom.slave;
+   route_vector[boot_rom_slave_num] = soc_map.m_boot_rom_addr_range;
 
    // Fabric to CPU's Near_Mem back door
-   mkConnection (fabric.v_to_slaves [tcm_back_door_slave_num],   core.cpu_slave);
+   slave_vector[tcm_back_door_slave_num] = core.cpu_slave;
+   route_vector[tcm_back_door_slave_num] = soc_map.m_tcm_addr_range;
 
    // Fabric to Mem Controller
-   mkConnection (fabric.v_to_slaves [mem0_controller_slave_num], mem0_controller.slave);
+   slave_vector[mem0_controller_slave_num] = mem0_controller.slave;
+   route_vector[mem0_controller_slave_num] = soc_map.m_mem0_controller_addr_range;
 
    // Fabric to UART0
-   mkConnection (fabric.v_to_slaves [uart0_slave_num],           uart0.slave);
+   slave_vector[uart0_slave_num] = uart0.slave;
+   route_vector[uart0_slave_num] = soc_map.m_uart0_addr_range;
 
 `ifdef INCLUDE_ACCEL0
    // Fabric to accel_aes0
-   mkConnection (fabric.v_to_slaves [accel0_slave_num],          accel_aes0.slave);
+   slave_vector[accel0_slave_num] = accel_aes0.slave);
+   route_vector[accel0_slave_num] = soc_map.m_accel0_addr_range;
 `endif
 
 `ifdef HTIF_MEMORY
    AXI4_Slave_IFC#(Wd_Id, Wd_Addr, Wd_Data, Wd_User) htif <- mkAxi4LRegFile(bytes_per_htif);
 
-   mkConnection (fabric.v_to_slaves [htif_slave_num], htif);
+   slave_vector[htif_slave_num] = htif;
+   route_vector[htif_slave_num] = soc_map.m_htif_addr_range;
 `endif
+
+   // SoC Fabric
+   let bus <- mkAXI4Bus (route_vector, map (fromAXIMasterSynth , master_vector), map (fromAXIMasterSynth , slave_vector));
 
    // ----------------
    // Connect interrupt sources for CPU external interrupt request inputs.

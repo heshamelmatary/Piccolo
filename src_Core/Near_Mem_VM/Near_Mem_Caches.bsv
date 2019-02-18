@@ -41,6 +41,7 @@ import ISA_Decls    :: *;
 import Near_Mem_IFC :: *;
 import MMU_Cache    :: *;
 import AXI4   :: *;
+import Routable :: *;
 import Near_Mem_IO  :: *;
 import Fabric_Defs  :: *;
 
@@ -99,8 +100,8 @@ module mkNear_Mem (Near_Mem_IFC);
       let _dummy2 <- dcache.server_reset.response.get;
       let _dummy3 <- near_mem_io.server_reset.response.get;
 
-      near_mem_io.set_addr_map (zeroExtend (soc_map.m_near_mem_io_addr_base),
-				zeroExtend (soc_map.m_near_mem_io_addr_lim));
+      near_mem_io.set_addr_map (zeroExtend (soc_map.m_near_mem_io_addr_range.base),
+	                        zeroExtend (rangeTop(soc_map.m_near_mem_io_addr_range));
 
       f_reset_rsps.enq (?);
       rg_state <= STATE_READY;
