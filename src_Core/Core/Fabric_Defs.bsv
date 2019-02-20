@@ -26,11 +26,13 @@ import AXI4 :: *;
 
 // ================================================================
 // Fabric parameters
+typedef 3 Num_Masters;
+typedef 4 Num_Slaves;
 
 // ----------------
 // Width of fabric 'id' buses
-typedef  4             Wd_Id;
-typedef  Bit #(Wd_Id)  Fabric_Id;
+typedef 4                                 Wd_MId;
+typedef TAdd#(Wd_MId, TLog#(Num_Masters)) Wd_SId;
 
 // ----------------
 // Width of fabric 'addr' buses
@@ -73,7 +75,7 @@ Integer  zlsbs_aligned_fabric_addr = valueOf (ZLSBs_Aligned_Fabric_Addr);
 // ================================================================
 // AXI4 defaults for this project
 
-Fabric_Id    fabric_default_id       = 0;
+Bit#(Wd_MId) fabric_default_mid      = 0;
 AXI4_Burst   fabric_default_burst    = INCR;
 AXI4_Lock    fabric_default_lock     = NORMAL;
 AXI4_Cache   fabric_default_arcache  = arcache_dev_nonbuf;

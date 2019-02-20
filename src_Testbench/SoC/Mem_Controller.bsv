@@ -185,7 +185,7 @@ interface Mem_Controller_IFC;
    method Action set_addr_map (Fabric_Addr addr_base, Fabric_Addr addr_lim);
 
    // Main Fabric Reqs/Rsps
-   interface AXI4_Slave_Synth #(Wd_Id, Wd_Addr, Wd_Data,
+   interface AXI4_Slave_Synth #(Wd_SId, Wd_Addr, Wd_Data,
                                 Wd_User, Wd_User, Wd_User, Wd_User, Wd_User) slave;
 
    // To raw memory (outside the SoC)
@@ -206,7 +206,7 @@ deriving (Bits, Eq, FShow);
 typedef struct {Req_Op                     req_op;
 
 		// AW and AR channel info
-		Fabric_Id                  id;
+		Bit#(Wd_SId)               id;
 		Fabric_Addr                addr;
 		AXI4_Len                   len;
 		AXI4_Size                  size;
@@ -243,8 +243,7 @@ module mkMem_Controller (Mem_Controller_IFC);
    FIFOF #(Bit #(0)) f_reset_rsps <- mkFIFOF;
 
    // Communication with fabric
-   AXI4_Slave_Xactor #(Wd_Id, Wd_Addr, Wd_Data,
-                       Wd_User, Wd_User, Wd_User, Wd_User, Wd_User) slave_xactor <- mkAXI4_Slave_Xactor;
+   let slave_xactor <- mkAXI4_Slave_Xactor;
 
    // Requests merged from the (WrA, WrD) and RdA channels
    FIFOF #(Req) f_reqs <- mkPipelineFIFOF;

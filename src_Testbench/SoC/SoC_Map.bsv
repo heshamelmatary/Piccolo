@@ -26,12 +26,10 @@ export  SoC_Map_IFC (..), mkSoC_Map;
 
 // export  fn_addr_in_range;
 
-export  Num_Masters;
 export  debug_module_master_num;
 export  imem_master_num;
 export  dmem_master_num;
 
-export  Num_Slaves;
 export  boot_rom_slave_num;
 export  tcm_back_door_slave_num;
 export  mem0_controller_slave_num;
@@ -183,16 +181,12 @@ endmodule
 // ================================================================
 // Count and master-numbers of masters in the fabric.
 
-typedef 3 Num_Masters;
-
 Integer debug_module_master_num = 0;
 Integer imem_master_num         = 1;
 Integer dmem_master_num         = 2;
 
 // ================================================================
 // Count and slave-numbers of slaves in the fabric.
-
-typedef 4 Num_Slaves;
 
 Integer tcm_back_door_slave_num   = 0;
 Integer boot_rom_slave_num        = 1;

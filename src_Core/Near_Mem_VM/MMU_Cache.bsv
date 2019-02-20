@@ -127,7 +127,7 @@ interface MMU_Cache_IFC;
    method Action tlb_flush;
 
    // Fabric master interface
-   interface AXI4_Master_Synth #(Wd_Id, Wd_Addr, Wd_Data,
+   interface AXI4_Master_Synth #(Wd_MId, Wd_Addr, Wd_Data,
                                  Wd_User, Wd_User, Wd_User, Wd_User, Wd_User) mem_master;
 
    // Near-mem IO interface (nearby memory-mapped locations like timer, core configs, ...)
@@ -444,8 +444,9 @@ module mkMMU_Cache  #(parameter Bool dmem_not_imem)  (MMU_Cache_IFC);
    FIFOF #(Requestor) f_reset_rsps <- mkFIFOF;
 
    // Fabric request/response
-   AXI4_Master_Xactor #(Wd_Id, Wd_Addr, Wd_Data,
-                        Wd_User, Wd_User, Wd_User, Wd_User, Wd_User) master_xactor <- mkAXI4_Master_Xactor;
+   AXI4_Master_Xactor#(Wd_MId, Wd_Addr, Wd_Data,
+                       Wd_User, Wd_User, Wd_User, Wd_User, Wd_User)
+                       master_xactor <- mkAXI4_Master_Xactor;
 
    FIFOF #(Near_Mem_IO_Req) f_near_mem_io_reqs <- mkFIFOF;
    FIFOF #(Near_Mem_IO_Rsp) f_near_mem_io_rsps <- mkFIFOF;
@@ -667,7 +668,7 @@ module mkMMU_Cache  #(parameter Bool dmem_not_imem)  (MMU_Cache_IFC);
    // Send a read-request into the fabric
    function Action fa_fabric_send_read_req (Fabric_Addr  addr, AXI4_Size  size);
       action
-	 let mem_req_rd_addr = AXI4_ARFlit {arid:     fabric_default_id,
+	 let mem_req_rd_addr = AXI4_ARFlit {arid:     fabric_default_mid,
 				            araddr:   addr,
 					    arlen:    0,           // burst len = arlen+1
 					    arsize:   size,
@@ -696,7 +697,7 @@ module mkMMU_Cache  #(parameter Bool dmem_not_imem)  (MMU_Cache_IFC);
 		.fabric_strb,
 		.fabric_size} = fn_to_fabric_write_fields (f3, pa, st_val);
 
-	 let mem_req_wr_addr = AXI4_AWFlit {awid:     fabric_default_id,
+	 let mem_req_wr_addr = AXI4_AWFlit {awid:     fabric_default_mid,
 					    awaddr:   fabric_addr,
 					    awlen:    0,           // burst len = awlen+1
 					    awsize:   fabric_size,

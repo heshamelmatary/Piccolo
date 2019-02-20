@@ -54,7 +54,7 @@ interface Near_Mem_IFC;
    interface IMem_IFC  imem;
 
    // Fabric side
-   interface AXI4_Master_Synth #(Wd_Id, Wd_Addr, Wd_Data,
+   interface AXI4_Master_Synth #(Wd_MId, Wd_Addr, Wd_Data,
                                  Wd_User, Wd_User, Wd_User, Wd_User, Wd_User) imem_master;
 
    // ----------------
@@ -64,7 +64,7 @@ interface Near_Mem_IFC;
    interface DMem_IFC  dmem;
 
    // Fabric side
-   interface AXI4_Master_Synth #(Wd_Id, Wd_Addr, Wd_Data,
+   interface AXI4_Master_Synth #(Wd_MId, Wd_Addr, Wd_Data,
                                  Wd_User, Wd_User, Wd_User, Wd_User, Wd_User) dmem_master;
 
    // ----------------
@@ -89,7 +89,7 @@ interface Near_Mem_IFC;
 
    // ----------------
    // Back-door slave interface from fabric into Near_Mem
-   interface AXI4_Slave_Synth #(Wd_Id, Wd_Addr, Wd_Data,
+   interface AXI4_Slave_Synth #(Wd_SId, Wd_Addr, Wd_Data,
                                 Wd_User, Wd_User, Wd_User, Wd_User, Wd_User) near_mem_slave;
 endinterface
    

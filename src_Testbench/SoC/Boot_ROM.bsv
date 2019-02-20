@@ -50,7 +50,7 @@ interface Boot_ROM_IFC;
    method Action set_addr_map (Fabric_Addr addr_base, Fabric_Addr addr_lim);
 
    // Main Fabric Reqs/Rsps
-   interface AXI4_Slave_Synth #(Wd_Id, Wd_Addr, Wd_Data,
+   interface AXI4_Slave_Synth #(Wd_SId, Wd_Addr, Wd_Data,
                                 Wd_User, Wd_User, Wd_User, Wd_User, Wd_User) slave;
 endinterface
 
@@ -70,8 +70,7 @@ module mkBoot_ROM (Boot_ROM_IFC);
    // ----------------
    // Connector to fabric
 
-   AXI4_Slave_Xactor #(Wd_Id, Wd_Addr, Wd_Data,
-                       Wd_User, Wd_User, Wd_User, Wd_User, Wd_User) slave_xactor <- mkAXI4_Slave_Xactor;
+   let slave_xactor <- mkAXI4_Slave_Xactor;
 
    // ----------------
 
