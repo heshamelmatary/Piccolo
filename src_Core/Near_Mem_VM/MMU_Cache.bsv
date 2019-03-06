@@ -1056,7 +1056,7 @@ module mkMMU_Cache  #(parameter Bool dmem_not_imem)  (MMU_Cache_IFC);
       PA           lev_1_pte_pa        = satp_pa + vpn_1_pa;
       PA           lev_1_pte_pa_w64    = { lev_1_pte_pa [pa_sz - 1 : 3], 3'b0 };    // 64b-aligned addr
       Fabric_Addr  lev_1_pte_pa_w64_fa = fn_PA_to_Fabric_Addr (lev_1_pte_pa_w64);
-      fa_fabric_send_read_req (lev_1_pte_pa_w64_fa, axsize_4);
+      fa_fabric_send_read_req (lev_1_pte_pa_w64_fa, 4);
 
       rg_pte_pa <= lev_1_pte_pa;
       rg_state  <= PTW_LEVEL_1;
@@ -1071,7 +1071,7 @@ module mkMMU_Cache  #(parameter Bool dmem_not_imem)  (MMU_Cache_IFC);
       PA           lev_2_pte_pa        = satp_pa + vpn_2_pa;
       PA           lev_2_pte_pa_w64    = { lev_2_pte_pa [pa_sz - 1 : 3], 3'b0 };    // 64b-aligned addr
       Fabric_Addr  lev_2_pte_pa_w64_fa = fn_PA_to_Fabric_Addr (lev_2_pte_pa_w64);
-      fa_fabric_send_read_req (lev_2_pte_pa_w64_fa, axsize_8);
+      fa_fabric_send_read_req (lev_2_pte_pa_w64_fa, 8);
 
       rg_pte_pa <= lev_2_pte_pa;
       rg_state  <= PTW_LEVEL_2;
@@ -1085,7 +1085,7 @@ module mkMMU_Cache  #(parameter Bool dmem_not_imem)  (MMU_Cache_IFC);
 `ifdef SV39
    rule rl_ptw_level_2 (rg_state == PTW_LEVEL_2);
       // Memory read-response is a level 1 PTE
-      let  mem_rsp <- pop_o (master_xactor.o_rd_data);
+      let mem_rsp <- get(master_xactor.slave.r);
 
       Bit #(64) x64 = zeroExtend (mem_rsp.rdata);
       WordXL pte;
@@ -1096,7 +1096,7 @@ module mkMMU_Cache  #(parameter Bool dmem_not_imem)  (MMU_Cache_IFC);
       pte = mem_rsp.rdata;
 
       // Bus error
-      if (mem_rsp.rresp != axi4_resp_okay) begin
+      if (mem_rsp.rresp != OKAY) begin
 	 rg_exc_code <= access_exc_code;
 	 rg_state    <= MODULE_EXCEPTION_RSP;
 	 if (cfg_verbosity > 1)
@@ -1128,7 +1128,7 @@ module mkMMU_Cache  #(parameter Bool dmem_not_imem)  (MMU_Cache_IFC);
 	 PA           lev_1_pte_pa        = lev_1_PTN_pa + vpn_1_pa;
 	 PA           lev_1_pte_pa_w64    = { lev_1_pte_pa [pa_sz - 1 : 3], 3'b0 };    // 64b-aligned addr
 	 Fabric_Addr  lev_1_pte_pa_w64_fa = fn_PA_to_Fabric_Addr (lev_1_pte_pa_w64);
-	 fa_fabric_send_read_req (lev_1_pte_pa_w64_fa, axsize_8);
+	 fa_fabric_send_read_req (lev_1_pte_pa_w64_fa, 8);
 
 	 rg_pte_pa <= lev_1_pte_pa;
 	 rg_state  <= PTW_LEVEL_1;
@@ -1172,7 +1172,7 @@ module mkMMU_Cache  #(parameter Bool dmem_not_imem)  (MMU_Cache_IFC);
 
    rule rl_ptw_level_1 (rg_state == PTW_LEVEL_1);
       // Memory read-response is a level 1 PTE
-      let  mem_rsp <- pop_o (master_xactor.o_rd_data);
+      let mem_rsp <- get(master_xactor.slave.r);
 
       Bit #(64) x64 = zeroExtend (mem_rsp.rdata);
       WordXL pte;
@@ -1189,7 +1189,7 @@ module mkMMU_Cache  #(parameter Bool dmem_not_imem)  (MMU_Cache_IFC);
 `endif      // ifndef RV32
 
       // Bus error
-      if (mem_rsp.rresp != axi4_resp_okay) begin
+      if (mem_rsp.rresp != OKAY) begin
 	 rg_exc_code <= access_exc_code;
 	 rg_state    <= MODULE_EXCEPTION_RSP;
 	 if (cfg_verbosity > 1)
@@ -1222,9 +1222,9 @@ module mkMMU_Cache  #(parameter Bool dmem_not_imem)  (MMU_Cache_IFC);
 	 PA           lev_0_pte_pa_w64    = { lev_0_pte_pa [pa_sz - 1 : 3], 3'b0 };    // 64b-aligned addr
 	 Fabric_Addr  lev_0_pte_pa_w64_fa = fn_PA_to_Fabric_Addr (lev_0_pte_pa_w64);
 `ifdef Sv32
-	 AXI4_Size    axi4_size           = axsize_4;
+	 AXI4_Size    axi4_size           = 4;
 `else
-	 AXI4_Size    axi4_size           = axsize_8;
+	 AXI4_Size    axi4_size           = 8;
 `endif
 	 fa_fabric_send_read_req (lev_0_pte_pa_w64_fa, axi4_size);
 
@@ -1270,7 +1270,7 @@ module mkMMU_Cache  #(parameter Bool dmem_not_imem)  (MMU_Cache_IFC);
 
    rule rl_ptw_level_0 (rg_state == PTW_LEVEL_0);
       // Memory read-response is a level 0 PTE
-      let mem_rsp <- pop_o (master_xactor.o_rd_data);
+      let mem_rsp <- get(master_xactor.slave.r);
 
       Bit #(64) x64 = zeroExtend (mem_rsp.rdata);
       WordXL pte;
@@ -1287,7 +1287,7 @@ module mkMMU_Cache  #(parameter Bool dmem_not_imem)  (MMU_Cache_IFC);
 `endif      // ifndef RV32
 
       // Bus error
-      if (mem_rsp.rresp != axi4_resp_okay) begin
+      if (mem_rsp.rresp != OKAY) begin
 	 rg_exc_code <= access_exc_code;
 	 rg_state    <= MODULE_EXCEPTION_RSP;
 	 if (cfg_verbosity > 1)
