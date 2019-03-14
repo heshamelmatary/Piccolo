@@ -1617,7 +1617,7 @@ module mkMMU_Cache  #(parameter Bool dmem_not_imem)  (MMU_Cache_IFC);
 	 $display ("    ", fshow (rsp));
       end
 
-      let ld_val = fn_extract_and_extend_bytes(rg_f3, rg_addr, zeroExtend (rsp.rdata));
+      let ld_val = zeroExtend (rsp.rdata);
       rg_ld_val <= ld_val;
 
       // Successful read
